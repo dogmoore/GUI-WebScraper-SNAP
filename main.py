@@ -2,9 +2,10 @@ import os
 import threading
 from tkinter import *
 import time
-import requests
-from bs4 import *
+import requests  # pip install requests
+from bs4 import *  # pip install beautifulsoup4
 
+# global variables
 VERSION = '1.0.0-SNAP'
 debug = True
 ping_result = None  # should equal True after ping thread finishes
@@ -16,7 +17,7 @@ if debug:
     print("thread 1 created")
 
 
-def scraper():
+def scraper():  # needs building
     url = url_entry.get()
     page = requests.get(url)
 
@@ -52,14 +53,14 @@ def thread_window():  # thread 3
     window.mainloop()  # blocking
 
 
-def error_window(x):  # template for error windows
+def error_window(error_message):  # template for error windows
     error = Tk()
     error.title("An error occurred!")
     error.geometry('300x60+20+30')
-    error_label = Label(error, text=x)
+    error_label = Label(error, text=error_message)
     error_label.place(x=10, y=20)
     error.focus_force()
-    error.mainloop()
+    error.mainloop()  # blocking
 
 
 def scrape_parse(selection):
@@ -68,7 +69,7 @@ def scrape_parse(selection):
         0: "test 0",
         1: "test 1"
     }
-    return switcher.get(prop, "test 3")  # second argument is default
+    return switcher.get(prop, "test default")  # second argument is default
 
 
 def on_click_1():  # cancel button
@@ -84,7 +85,7 @@ def on_click_2():  # continue button
         prop = scrape_parse(scrape_entry.curselection())
         wip = Label(GUI, text=f"I gathered {prop}", fg="red")
         wip.place(x=125, y=350)
-    except :  # cant find correct exception
+    except EXCEPTION:  # cant find correct exception
         pass
 
 
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         cont = Button(GUI, text="Continue", command=on_click_2)
         cont.place(x=300, y=300)
 
-        GUI.mainloop()
+        GUI.mainloop()  # blocking
     elif ping_result is None:  # ping check didn't happen
         error_window('ping failed to launch')
     else:  # ping check failed
