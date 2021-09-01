@@ -12,8 +12,17 @@ ping_result = None  # should equal True after ping thread finishes
 # thread 1 is main
 if debug:
     print(f"creating Python WebScraper {VERSION}")
-    time.sleep(0.1)  # blocking
+    time.sleep(0.5)  # blocking
     print("thread 1 created")
+
+
+def scraper():
+    url = url_entry.get()
+    page = requests.get(url)
+
+    soup = BeautifulSoup(page.content, "html.parser")
+    results = soup.find(id="ResultsContainer")
+    print(results.prettify())
 
 
 def thread_ping():  # thread 2
@@ -43,7 +52,7 @@ def thread_window():  # thread 3
     window.mainloop()  # blocking
 
 
-def error_window(x):
+def error_window(x):  # template for error windows
     error = Tk()
     error.title("An error occurred!")
     error.geometry('300x60+20+30')
@@ -53,26 +62,30 @@ def error_window(x):
     error.mainloop()
 
 
-def scrape_parse(selection):  # broken
+def scrape_parse(selection):
+    prop = scrape_entry.index(selection)  # converts tuple to an int based on selection, errors if none is selected
     switcher = {
         0: "test 0",
-        1: "test 1",
-        2: "test 2"
+        1: "test 1"
     }
-    return switcher.get(selection, "make valid selection")
+    return switcher.get(prop, "test 3")  # second argument is default
 
 
 def on_click_1():  # cancel button
     print("button 1 pushed, closing program")
+    time.sleep(0.5)  # blocking
     GUI.destroy()
 
 
 def on_click_2():  # continue button
     print("button pushed 2, launching parser **WIP**")
-    url = url_entry.get()
-    prop = scrape_parse(scrape_entry.curselection())
-    wip = Label(GUI, text=f"I gathered {prop}", fg="red")
-    wip.place(x=125, y=350)
+    # scraper()
+    try:
+        prop = scrape_parse(scrape_entry.curselection())
+        wip = Label(GUI, text=f"I gathered {prop}", fg="red")
+        wip.place(x=125, y=350)
+    except :  # cant find correct exception
+        pass
 
 
 if __name__ == "__main__":
@@ -81,9 +94,6 @@ if __name__ == "__main__":
     window_thread.setDaemon(True)
 
     ping = threading.Thread(target=thread_ping)
-
-    # if debug:
-    #     print("creating GUI window")
 
     ping.start()
     window_thread.start()
@@ -107,8 +117,10 @@ if __name__ == "__main__":
         url_label.place(x=30, y=25)
 
         scrape_entry = Listbox(GUI, selectmode=SINGLE)
-        scrape_entry.insert(1, "test")
+
+        scrape_entry.insert(1, "test")  # return a value of 0 in tuple form
         scrape_entry.insert(2, "test2")
+
         scrape_entry.place(x=30, y=100)
         scrape_label = Label(GUI, text='Scrape')
         scrape_label.place(x=30, y=75)
